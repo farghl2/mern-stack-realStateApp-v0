@@ -1,6 +1,6 @@
 
 
-export default function LogIn() {
+export default function SignIn() {
   return (
     <div>login</div>
   )
