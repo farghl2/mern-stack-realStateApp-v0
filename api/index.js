@@ -16,10 +16,7 @@ mongoose.connect(process.env.DB_LINK).then(()=>{
 
 app.use('/api/user',userRouter);
 app.use('/api/auth',authRouter);
-// app.use((erorr,req,res)=>{
-//     res.status(erorr.statusCode ||500).json({message:erorr.statusMessage || 'internal erorr message'})
 
-// })
 
 app.listen(3000, ()=>{
     console.log('the server is running at port 3000')
