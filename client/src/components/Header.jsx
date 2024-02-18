@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 const Header = () => {
   return (
-    <AppBar position="static" className="bg-red-500 header-bg">
+    <AppBar position="static" className="bg-slate-500 header-bg">
       <Toolbar className="flex justify-between p-4">
         <Link to="/">
         <Typography variant="h6" component="div" className='text-slate-100 size-4 sm:size-8 flex items-center w-fit'>
