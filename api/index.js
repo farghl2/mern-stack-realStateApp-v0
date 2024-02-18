@@ -10,6 +10,7 @@ const app = express();
 
 dotenv.config()
 app.use(express.json())
+app.use(cookieParser());
 mongoose.connect(process.env.DB_LINK).then(()=>{
     console.log('db is running!')
 })
