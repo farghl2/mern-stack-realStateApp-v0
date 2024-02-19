@@ -1,14 +1,14 @@
 import { TextField } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link , useNavigate} from 'react-router-dom';
 
 export default function SignIn() {
   const [formData, setFormData] = useState({
     email:'',
     password:''
   })
-
+  const navigate = useNavigate();
   const [error ,setError]= useState(null)
   // const [loading, setLoading]= useState(false)
 
@@ -31,6 +31,9 @@ export default function SignIn() {
       body:JSON.stringify(formData)
     });
     const data =await res.json()
+    if(data.status === 'success'){
+      navigate('/home')
+    }
     setError(data.data.title)
   }
   return (

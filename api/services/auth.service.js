@@ -1,59 +1,58 @@
 import bcrybt from 'bcryptjs'
-import jwt from 'jsonwebtoken';
 import userModel from '../models/user.model.js'
+import asyncWraber from '../middlewares/asyncWraber.js';
+import appError from '../utils/appError.js';
+import { SUCCESS, FAIL, ERROR } from '../utils/httpResStatusText.js';
+import generateToken from '../utils/generateJWT.js';
 
-export const signUp = async(req, res, next)=>{
-    const {username, email, password} = req.body;
- try{
-    const currentUser = await userModel.findOne({username:username})
-    if(currentUser){
-        return res.status(400).json({
-            status:'faild',
-            data:{
-                title:'this email exist'
-            }
-            });
-    }else if(currentUser){
-        return res.status(400).json({message:'this username is exist'});
+export const signUp = asyncWraber(async (req, res, next) => {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+        const error = appError.create(500, FAIL, 'enter all required data');
+        return next(error);
     }
-     const crybtedPassword = bcrybt.hashSync(password,10);
+
+    const existUser = await userModel.findOne({ email })
+    if (existUser) {
+        const error = appError.create(400, FAIL, 'this username or email existing');
+        return next(error);
+       
+    }
+
+    const crybtedPassword = bcrybt.hashSync(password, 10);
     const newUser = new userModel({
         username,
         email,
-        password:crybtedPassword
+        password: crybtedPassword
     });
+
     const user = await newUser.save()
-    return res.status(201).json({
-        status:'success',
-        data:{
-            title:'user created succssfuly'
+    const token =await generateToken({email:user.email,id:user._id});
+    return res.cookie('token',token,{httpOnly:true}).status(201).json({
+        status: SUCCESS,
+        data: {
+            message: 'user created successfuly'
         }
-        });
-}catch(erorr){
-    // next(erorr)
-    res.status(500).json({message:erorr.message})
-}
-   
-}
+    });
 
 
-export const signIn = async (req, res,next)=>{
-    const {email, password} = req.body;
+})
 
-    try {
-        const validUser =await userModel.findOne({email:email});
-        if(!validUser){
-            return res.status(401).json({status:'faild',data:{title:'this user not exit'}})
-        }
-        const validPassword = bcrybt.compareSync(password, validUser.password);
-        if(!validPassword){
-            return res.status(400).json({status:'falid',data:{title:'this password is wrong'}})
-        }
-        const token = jwt.sign({userId:validUser._id},process.env.SCT_TOKEN);
-        res.cookie('token',token,{httpOnly:true})
-        res.status(200).json({status:'success',data:{title:'user enter success!'}})
 
-    }catch(error){
-        res.status(500).json({message:erorr.message})
+export const signIn =asyncWraber(async (req, res, next) => {
+    const { email, password } = req.body;
+
+
+    const validUser = await userModel.findOne({ email: email });
+    if (!validUser) {
+        const error = appError.create(500, FAIL, 'user not found')
+        return next(error)
     }
-}
+    const validPassword = bcrybt.compareSync(password, validUser.password);
+    if (!validPassword) {
+        const error = appError.create(500, ERROR, 'wrong password')
+    }
+    const token = await generateToken({ email: validUser.email, id: validUser._id });
+    res.cookie('token', token, { httpOnly: true }).status(200).json({ status: SUCCESS, data: { message: 'user login successfuly' } });
+})

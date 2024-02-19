@@ -1,7 +1,7 @@
 import { TextField } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link ,useNavigate} from 'react-router-dom';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -9,7 +9,7 @@ export default function SignUp() {
     email:'',
     password:''
   })
-
+  const navigate = useNavigate();
   const [error ,setError]= useState(null)
   // const [loading, setLoading]= useState(false)
 
@@ -24,7 +24,7 @@ export default function SignUp() {
 
   const handleSubmit =async (e)=>{
     e.preventDefault();
-    const res= await fetch('/api/auth/signup',{
+    const res= await fetch('api/auth/signup',{
       method:'POST',
       headers:{
         'Content-Type':'application/json'
@@ -32,7 +32,11 @@ export default function SignUp() {
       body:JSON.stringify(formData)
     });
     const data =await res.json()
-    setError(data.data.title)
+    if(data.status === 'success'){
+      navigate('/home')
+
+    }
+    setError(data.data.message)
   }
   return (
     <>
