@@ -1,7 +1,9 @@
 import { TextField } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link ,useNavigate} from 'react-router-dom';
+import { signinFailer, signinStart, signinSuccess } from "../redux/user/userSlice";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -9,9 +11,11 @@ export default function SignUp() {
     email:'',
     password:''
   })
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [error ,setError]= useState(null)
+  // const [error ,setError]= useState(null)
   // const [loading, setLoading]= useState(false)
+  const {loading, error} = useSelector((state)=>state.user)
 
   const handleChange =(e)=>{
     const {name, value} = e.target;
@@ -23,7 +27,9 @@ export default function SignUp() {
   }
 
   const handleSubmit =async (e)=>{
+    dispatch(signinStart());
     e.preventDefault();
+    try{
     const res= await fetch('api/auth/signup',{
       method:'POST',
       headers:{
@@ -31,13 +37,18 @@ export default function SignUp() {
       },
       body:JSON.stringify(formData)
     });
-    const data =await res.json()
-    if(data.status === 'success'){
-      navigate('/home')
+    const {data, status} =await res.json()
+    if(status === 'success'){
+      dispatch(signinSuccess(data));
+      navigate('/')
 
     }
-    setError(data.data.message)
+  }catch(error){
+    dispatch(signinFailer(error.message))
+    
   }
+
+}
   return (
     <>
     <form 
@@ -81,7 +92,7 @@ export default function SignUp() {
         className="!bg-slate-500 w-[50%] !py-2 uppercase"
         type="submit"
       >
-        Sign Up
+        {loading ? 'loading...':'Sign Up'}
       </Button>
     </form>
     <div className="flex gap-1 justify-center">

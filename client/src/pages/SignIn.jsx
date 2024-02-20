@@ -1,15 +1,19 @@
 import { TextField } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link , useNavigate} from 'react-router-dom';
+import { signinFailer, signinStart, signinSuccess } from "../redux/user/userSlice";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({
     email:'',
     password:''
   })
+  const dispatch = useDispatch();
+  const {error, loading} = useSelector((state)=>state.user)
   const navigate = useNavigate();
-  const [error ,setError]= useState(null)
+  // const [error ,setError]= useState(null)
   // const [loading, setLoading]= useState(false)
 
   const handleChange =(e)=>{
@@ -23,6 +27,8 @@ export default function SignIn() {
 
   const handleSubmit =async (e)=>{
     e.preventDefault();
+    dispatch(signinStart());
+    try{
     const res= await fetch('/api/auth/signin',{
       method:'POST',
       headers:{
@@ -30,11 +36,15 @@ export default function SignIn() {
       },
       body:JSON.stringify(formData)
     });
-    const data =await res.json()
-    if(data.status === 'success'){
-      navigate('/home')
+    const {data, status }=await res.json()
+    if(status === 'success'){
+      dispatch(signinSuccess(data))
+      navigate('/')
     }
-    setError(data.data.title)
+  }catch(error){
+    dispatch(signinFailer(error.message))
+  }
+    
   }
   return (
     <>
@@ -70,7 +80,7 @@ export default function SignIn() {
         className="!bg-slate-500 w-[50%] !py-2 uppercase"
         type="submit"
       >
-        Sign In
+       {loading?'loading...':' Sign In'}
       </Button>
     </form>
     <div className="flex gap-1 justify-center">

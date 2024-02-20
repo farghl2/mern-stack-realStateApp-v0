@@ -29,10 +29,15 @@ export const signUp = asyncWraber(async (req, res, next) => {
 
     const user = await newUser.save()
     const token =await generateToken({email:user.email,id:user._id});
+    console.log(user)
     return res.cookie('token',token,{httpOnly:true}).status(201).json({
         status: SUCCESS,
         data: {
-            message: 'user created successfuly'
+            username:user.username,
+            email:user.email,
+            _id:user._id,
+            createdAt:user.createdAt,
+            updatedAt:user.updatedAt
         }
     });
 
@@ -54,5 +59,5 @@ export const signIn =asyncWraber(async (req, res, next) => {
         const error = appError.create(500, ERROR, 'wrong password')
     }
     const token = await generateToken({ email: validUser.email, id: validUser._id });
-    res.cookie('token', token, { httpOnly: true }).status(200).json({ status: SUCCESS, data: { message: 'user login successfuly' } });
+    res.cookie('token', token, { httpOnly: true }).status(200).json({ status: SUCCESS, data: {password:'pas',...validUser} });
 })
