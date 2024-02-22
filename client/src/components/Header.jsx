@@ -2,9 +2,11 @@
 // import React from 'react';
 import { AppBar, Toolbar, Typography, InputBase } from '@mui/material';
 import { FaSearch } from "react-icons/fa";
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
+  const {currentUser} = useSelector((state)=>state.user);
   return (
     <AppBar position="static" className="bg-slate-500 header-bg">
       <Toolbar className="flex justify-between p-4">
@@ -22,10 +24,18 @@ const Header = () => {
           />
           <FaSearch  className='text-slate-500'/>
         </div>
-        <div className="space-x-0 sm:space-x-4">
+        <div className="space-x-0 sm:space-x-4 flex ">
           <Link to="/" className="text-white hidden sm:inline  hover:underline">Home</Link>
           <Link to="/about" className="text-white hidden sm:inline hover:underline">About</Link>
-          <Link to="/sign-up" className="text-white hover:underline">Sign Up</Link>
+          {currentUser?
+          <Link to='/profile' 
+          >
+            <img src={currentUser.photoURL} alt='profile' 
+            className='w-7 h-7 object-cover rounded-full'
+            />
+          </Link>
+          :
+          <Link to="/sign-up" className="text-white hover:underline">Sign Up</Link>}
         </div>
       </Toolbar>
     </AppBar>

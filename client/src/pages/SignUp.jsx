@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link ,useNavigate} from 'react-router-dom';
 import { signinFailer, signinStart, signinSuccess } from "../redux/user/userSlice";
+import GoogleAuth from "../components/GoogleAuth";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -94,6 +95,7 @@ export default function SignUp() {
       >
         {loading ? 'loading...':'Sign Up'}
       </Button>
+      <GoogleAuth />
     </form>
     <div className="flex gap-1 justify-center">
       <p>Have an account? </p> <Link to='/sign-in' className="text-blue-600 font-semibold" >Sign in</Link>
