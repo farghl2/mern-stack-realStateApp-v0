@@ -14,8 +14,7 @@ export default function SignIn() {
   const dispatch = useDispatch();
   const {error, loading} = useSelector((state)=>state.user)
   const navigate = useNavigate();
-  // const [error ,setError]= useState(null)
-  // const [loading, setLoading]= useState(false)
+ 
 
   const handleChange =(e)=>{
     const {name, value} = e.target;
