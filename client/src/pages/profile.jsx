@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getDownloadURL,
   getStorage,
@@ -7,12 +7,16 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../../firebase.js";
+import { updateUserFailer, updateUserStart, updateUserSuccess } from "../redux/user/userSlice.js";
+
+
 
 export default function Profile() {
   const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({});
 
-  // const [selectedFile, setSelectedFile] = useState(null);
+  
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
   const [file, setFile] = useState(undefined);
@@ -48,7 +52,6 @@ export default function Profile() {
   };
 
   const handleUserData = (e) => {
-    console.log(e.target.value);
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -56,8 +59,25 @@ export default function Profile() {
     });
   };
 
-  const handelSubmit = (e) => {
+  const handelSubmit =async (e) => {
+
     e.preventDefault();
+    dispatch(updateUserStart());
+    
+    try{
+      const res= await fetch(`/api/user/updateUser/${currentUser._id}`,{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify(formData)
+      });
+      const {status, data} = await res.json()
+      dispatch(updateUserSuccess(data));
+
+    }catch(error){
+      dispatch(updateUserFailer(error.message))
+    }
   };
   return (
     <main className="p-3 max-w-xl mx-auto">
