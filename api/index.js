@@ -5,11 +5,15 @@ import userRouter from './routes/user.route.js'
 import authRouter from './routes/auth.route.js'
 import { ERROR } from "./utils/httpResStatusText.js";
 import connectDB from "./data/db.js";
+import cookieParser from 'cookie-parser';
+import verifyToken from "./middlewares/verifyToken.js";
 
 const app = express();
 
-dotenv.config()
-app.use(express.json())
+
+dotenv.config();
+app.use(express.json());
+app.use(cookieParser());
 
 connectDB()
 

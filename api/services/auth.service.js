@@ -51,6 +51,7 @@ export const signIn =asyncWraber(async (req, res, next) => {
     const validPassword = bcrybt.compareSync(password, validUser.password);
     if (!validPassword) {
         const error = appError.create(500, ERROR, 'wrong password')
+       return next(error);
     }
     const token = await generateToken({ email: validUser.email, id: validUser._id });
     const { password:pass,...data} = validUser._doc;
