@@ -7,17 +7,23 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../../firebase.js";
-import { updateUserFailer, updateUserStart, updateUserSuccess,
-deleteAccountStart,deleteAccountSuccess,deleteAccountFailer } from "../redux/user/userSlice.js";
-
-
+import {
+  updateUserFailer,
+  updateUserStart,
+  updateUserSuccess,
+  deleteAccountStart,
+  deleteAccountSuccess,
+  deleteAccountFailer,
+  signOutStart,
+  signOutSuccess,
+  signOutFailer,
+} from "../redux/user/userSlice.js";
 
 export default function Profile() {
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({});
 
-  
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
   const [file, setFile] = useState(undefined);
@@ -60,47 +66,62 @@ export default function Profile() {
     });
   };
 
-  const handelSubmit =async (e) => {
-
+  const handelSubmit = async (e) => {
     e.preventDefault();
     dispatch(updateUserStart());
-    
-    try{
-      const res= await fetch(`/api/user/updateUser/${currentUser._id}`,{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json'
-        },
-        body:JSON.stringify(formData)
-      });
-      const {data} = await res.json()
-      dispatch(updateUserSuccess(data));
 
-    }catch(error){
-      dispatch(updateUserFailer(error.message))
+    try {
+      const res = await fetch(`/api/user/updateUser/${currentUser._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const { data } = await res.json();
+      dispatch(updateUserSuccess(data));
+    } catch (error) {
+      dispatch(updateUserFailer(error.message));
     }
   };
 
-  const deleteAccount = async()=>{
+  const deleteAccount = async () => {
     dispatch(deleteAccountStart());
-    try{
-      const res= await fetch(`/api/user/deleteUser/${currentUser._id}`,{
-        method:'DELETE',
-        headers:{
-          'Content-Type':'application/json'
+    try {
+      const res = await fetch(`/api/user/deleteUser/${currentUser._id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
         },
-        body:JSON.stringify(currentUser.id)
+        body: JSON.stringify(currentUser.id),
       });
-      const {status} = await res.json()
-      if(status === 'success'){
+      const { status } = await res.json();
+      if (status === "success") {
         dispatch(deleteAccountSuccess(null));
-
       }
-
-    }catch(error){
+    } catch (error) {
       dispatch(deleteAccountFailer(error.message));
     }
-    
+  };
+
+  const signOut = async()=>{
+    dispatch(signOutStart());
+    try {
+      const res = await fetch(`/api/user/signOut/${currentUser._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(currentUser.id),
+      });
+      const { status } = await res.json();
+      if (status === "success") {
+        dispatch(signOutSuccess(null));
+      }
+    } catch (error) {
+      dispatch(signOutFailer(error.message));
+    }
+
   }
   return (
     <main className="p-3 max-w-xl mx-auto">
@@ -124,14 +145,14 @@ export default function Profile() {
         <p className="text-sm text-center">
           {fileUploadError ? (
             <span className="text-red-700">wrong upload</span>
-          ) : 
-            uploadProgress > 0 && uploadProgress < 100
-          
-          ?
-          (<span className="text-slate-400">{`Uploading ${uploadProgress}`}</span>)
-          : uploadProgress === 100?(
-          <span className="text-green-500">Image upload succssfuly</span>)
-          :('')}</p>
+          ) : uploadProgress > 0 && uploadProgress < 100 ? (
+            <span className="text-slate-400">{`Uploading ${uploadProgress}`}</span>
+          ) : uploadProgress === 100 ? (
+            <span className="text-green-500">Image upload succssfuly</span>
+          ) : (
+            ""
+          )}
+        </p>
         <input
           className="rounded-lg p-3"
           defaultValue={currentUser.username}
@@ -169,9 +190,17 @@ export default function Profile() {
         </button>
       </form>
       <div className="flex justify-between py-4">
+        <span
+          className="text-red-700 font-semibold cursor-pointer"
+          onClick={deleteAccount}
+        >
+          Delete Account
+        </span>
         <span className="text-red-700 font-semibold cursor-pointer"
-        onClick={deleteAccount}>Delete Account</span>
-        <span className="text-red-700 font-semibold cursor-pointer">Sign out</span>
+        onClick={signOut}
+        >
+          Sign out
+        </span>
       </div>
     </main>
   );

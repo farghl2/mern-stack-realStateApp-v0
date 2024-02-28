@@ -35,6 +35,10 @@ export const deleteUser = asyncWraber(async (req, res, next)=>{
     }
 
     const deleteAccount = await userModel.findByIdAndDelete({_id:id});
-    return res.clearCookie('token').status(200).json({status:SUCCESS,data:{message:'user deleted successFuly'}});
+    return res.clearCookie('token').status(200).json({status:SUCCESS,message:'user deleted successFuly'});
 
 })
+
+export const signOut = (req, res, next)=>{
+    return res.clearCookie('token').status(200).json({status:SUCCESS, message:'user sign out successfuly'});
+}
