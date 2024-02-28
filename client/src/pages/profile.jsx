@@ -7,7 +7,8 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../../firebase.js";
-import { updateUserFailer, updateUserStart, updateUserSuccess } from "../redux/user/userSlice.js";
+import { updateUserFailer, updateUserStart, updateUserSuccess,
+deleteAccountStart,deleteAccountSuccess,deleteAccountFailer } from "../redux/user/userSlice.js";
 
 
 
@@ -40,7 +41,7 @@ export default function Profile() {
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         setUploadProgress(Math.round(progress));
       },
-      (error) => {
+      () => {
         setUploadFileError(true);
       },
       () => {
@@ -72,13 +73,35 @@ export default function Profile() {
         },
         body:JSON.stringify(formData)
       });
-      const {status, data} = await res.json()
+      const {data} = await res.json()
       dispatch(updateUserSuccess(data));
 
     }catch(error){
       dispatch(updateUserFailer(error.message))
     }
   };
+
+  const deleteAccount = async()=>{
+    dispatch(deleteAccountStart());
+    try{
+      const res= await fetch(`/api/user/deleteUser/${currentUser._id}`,{
+        method:'DELETE',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify(currentUser.id)
+      });
+      const {status} = await res.json()
+      if(status === 'success'){
+        dispatch(deleteAccountSuccess(null));
+
+      }
+
+    }catch(error){
+      dispatch(deleteAccountFailer(error.message));
+    }
+    
+  }
   return (
     <main className="p-3 max-w-xl mx-auto">
       <h1 className="font-semibold text-3xl text-center p-3">Profile</h1>
@@ -145,6 +168,11 @@ export default function Profile() {
           update
         </button>
       </form>
+      <div className="flex justify-between py-4">
+        <span className="text-red-700 font-semibold cursor-pointer"
+        onClick={deleteAccount}>Delete Account</span>
+        <span className="text-red-700 font-semibold cursor-pointer">Sign out</span>
+      </div>
     </main>
   );
 }

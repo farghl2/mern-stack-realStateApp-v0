@@ -24,4 +24,17 @@ export const updateUser =asyncWraber(async (req, res, next) => {
     const updatedData =await userModel.findByIdAndUpdate({_id:id},{$set:reqData},{new:true});
     const {password:pass, ...data} = updatedData._doc;
     return res.status(200).json({status:SUCCESS, data });
+});
+
+
+export const deleteUser = asyncWraber(async (req, res, next)=>{
+    const id = req.user.id;
+    if (id != req.params.id) {
+        const error = appError.create(401, FAIL, 'you can change your account only');
+        return next(error);
+    }
+
+    const deleteAccount = await userModel.findByIdAndDelete({_id:id});
+    return res.clearCookie('token').status(200).json({status:SUCCESS,data:{message:'user deleted successFuly'}});
+
 })
