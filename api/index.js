@@ -1,12 +1,15 @@
 import  express  from "express";
 import dotenv from "dotenv"
+import cookieParser from 'cookie-parser';
+
+import connectDB from "./data/db.js";
 
 import userRouter from './routes/user.route.js'
-import authRouter from './routes/auth.route.js'
-import { ERROR } from "./utils/httpResStatusText.js";
-import connectDB from "./data/db.js";
-import cookieParser from 'cookie-parser';
-import verifyToken from "./middlewares/verifyToken.js";
+import authRouter from './routes/auth.router.js'
+import listingRouter from './routes/listing.route.js'
+
+
+
 
 const app = express();
 
@@ -19,6 +22,7 @@ connectDB()
 
 app.use('/api/user',userRouter);
 app.use('/api/auth',authRouter);
+app.use('/api/list',listingRouter)
 
 
 app.use((error, req, res,next)=>{
