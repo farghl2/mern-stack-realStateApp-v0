@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import {
   getDownloadURL,
   getStorage,
@@ -184,11 +185,15 @@ export default function Profile() {
 
         <button
           type="submit"
-          className="uppercase bg-green-700 text-white rounded-lg p-3 font-semibold hover:opacity-95"
+          className="uppercase bg-slate-700 text-white rounded-lg p-3 font-semibold hover:opacity-95"
+          
         >
           update
         </button>
       </form>
+      <Link to="/create-listing"
+      className="uppercase text-white bg-green-600 rounded-lg flex p-3 justify-center font-semibold my-3 hover:opacity-95"
+      >create listing</Link>
       <div className="flex justify-between py-4">
         <span
           className="text-red-700 font-semibold cursor-pointer"
